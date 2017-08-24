@@ -2,12 +2,17 @@ import scrapy
 
 class NcLegBillSpider(scrapy.Spider):
     name = "bills"
-    houseBills = 'http://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=H%num%&Session=2017'
-    billStart = 1;
+    houseBills = 'http://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=%chamber%%num%&Session=%session%'
+    billStart = 1
+
+    def __init__(self, chamber='', session='',*args, **kwargs):
+        super(NcLegBillSpider, self).__init__(*args, **kwargs)
+        self.chamber = chamber
+        self.session = session
 
     def start_requests(self):
         while self.billStart > 0:
-            yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.billStart)), callback=self.parse)
+            yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.billStart)).replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse)
             self.billStart += 1
 
     def parse(self, response):
