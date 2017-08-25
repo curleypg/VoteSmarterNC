@@ -1,12 +1,12 @@
 import scrapy
 
-class NcLegBillSpider(scrapy.Spider):
+class NcLegBillsSpider(scrapy.Spider):
     name = "bills"
     houseBills = 'http://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=%chamber%%num%&Session=%session%'
     billStart = 1
 
     def __init__(self, chamber='', session='',*args, **kwargs):
-        super(NcLegBillSpider, self).__init__(*args, **kwargs)
+        super(NcLegBillsSpider, self).__init__(*args, **kwargs)
         self.chamber = chamber
         self.session = session
 
