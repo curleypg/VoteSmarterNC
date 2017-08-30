@@ -1,8 +1,5 @@
 import scrapy
-
-class Member(scrapy.Item):
-    member = scrapy.Field()
-    href = scrapy.Field()
+from ncleg.items import Member
 
 class NcLegMemberVotesSpider(scrapy.Spider):
     name = "membervotes"
