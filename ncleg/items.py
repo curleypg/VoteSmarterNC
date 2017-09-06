@@ -19,6 +19,8 @@ class Member(scrapy.Item):
     vote = scrapy.Field()
 
 class MemberVotes(scrapy.Item):
+    member = scrapy.Field()
+    href = scrapy.Field()
     chamber = scrapy.Field()
     rcs = scrapy.Field()
     bill = scrapy.Field()
