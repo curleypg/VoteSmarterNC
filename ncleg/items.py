@@ -16,3 +16,20 @@ class NclegItem(scrapy.Item):
 class Member(scrapy.Item):
     member = scrapy.Field()
     href = scrapy.Field()
+    vote = scrapy.Field()
+
+class MemberVotes(scrapy.Item):
+    chamber = scrapy.Field()
+    rcs = scrapy.Field()
+    bill = scrapy.Field()
+    motion = scrapy.Field()
+    motiontwo = scrapy.Field()
+    date = scrapy.Field()
+    vote = scrapy.Field()
+    aye = scrapy.Field()
+    nay = scrapy.Field()
+    nv = scrapy.Field()
+    excabs = scrapy.Field()
+    excvote = scrapy.Field()
+    totalvote = scrapy.Field()
+    result = scrapy.Field()
