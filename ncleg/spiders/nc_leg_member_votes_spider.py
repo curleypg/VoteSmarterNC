@@ -1,4 +1,5 @@
 import scrapy
+from urllib.parse import urlparse, parse_qs
 from ncleg.items import Member, MemberVotes
 
 class NcLegMemberVotesSpider(scrapy.Spider):
@@ -20,11 +21,12 @@ class NcLegMemberVotesSpider(scrapy.Spider):
             info['member'] = member.xpath('.//a/text()').extract_first().replace('\u00a0', ' ')
             href = member.xpath('.//a/@href').extract_first()
             info['href'] = href
+            info['memberId'] = parse_qs(urlparse(href).query)['nUserID'][0]
             yield scrapy.Request(url=self.base+href, callback=self.parse_vote, meta={'item':info})
 
     def parse_vote(self, response):
         info = response.meta['item']
-        self.logger.info(info)
+        info['district'] = response.xpath('.//div[@id="title"]/text()')[0].re('\d+'),
         for vote in response.xpath('//div[@id="mainBody"]/table/tr'):
             motionData = vote.xpath('.//td[3]/text()').extract()
             if len(motionData) > 1:

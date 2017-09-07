@@ -15,11 +15,15 @@ class NclegItem(scrapy.Item):
 
 class Member(scrapy.Item):
     member = scrapy.Field()
+    memberId = scrapy.Field()
+    district = scrapy.Field()
     href = scrapy.Field()
     vote = scrapy.Field()
 
 class MemberVotes(scrapy.Item):
     member = scrapy.Field()
+    memberId = scrapy.Field()
+    district = scrapy.Field()
     href = scrapy.Field()
     chamber = scrapy.Field()
     rcs = scrapy.Field()
