@@ -2,7 +2,7 @@ import scrapy
 from ncleg.items import Member, MemberVotes
 
 class NcLegMemberVotesSpider(scrapy.Spider):
-    name = "membervotes"
+    name = "membersvotes"
     base = 'http://www.ncleg.net/'
     url = 'http://www.ncleg.net/gascripts/voteHistory/MemberVoteHistory.pl?sSession=%session%&sChamber=%chamber%'
 
