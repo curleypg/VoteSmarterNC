@@ -3,7 +3,8 @@ from ncleg.items import Member, MemberVotes
 
 class NcLegMemberVotesSpider(scrapy.Spider):
     name = "membervotes"
-    url = 'http://www.ncleg.net/gascripts/voteHistory/MemberVoteHistory.pl?sSession=%session%&sChamber=%chamber%&nUserID=916'
+    base = 'http://www.ncleg.net/'
+    url = 'http://www.ncleg.net/gascripts/voteHistory/MemberVoteHistory.pl?sSession=%session%&sChamber=%chamber%'
 
     def __init__(self, chamber='', session='',*args, **kwargs):
         super(NcLegMemberVotesSpider, self).__init__(*args, **kwargs)
@@ -11,7 +12,7 @@ class NcLegMemberVotesSpider(scrapy.Spider):
         self.session = session
 
     def start_requests(self):
-        yield scrapy.Request(url=self.url.replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse_vote)
+        yield scrapy.Request(url=self.url.replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse_members)
 
     def parse_members(self, response):
         for member in response.xpath('//div[@id="mainBody"]/ul/li'):
@@ -19,11 +20,12 @@ class NcLegMemberVotesSpider(scrapy.Spider):
             info['member'] = member.xpath('.//a/text()').extract_first().replace('\u00a0', ' ')
             href = member.xpath('.//a/@href').extract_first()
             info['href'] = href
-            yield scrapy.Request(url=href, callback=self.parse_vote, meta={'item':info})
+            yield scrapy.Request(url=self.base+href, callback=self.parse_vote, meta={'item':info})
 
     def parse_vote(self, response):
+        info = response.meta['item']
+        self.logger.info(info)
         for vote in response.xpath('//div[@id="mainBody"]/table/tr'):
-            info = response.meta['item']
             motionData = vote.xpath('.//td[3]/text()').extract()
             if len(motionData) > 1:
                 motion = motionData[0].strip() if len(motionData[0].strip()) > 1 else motionData[1].strip()
