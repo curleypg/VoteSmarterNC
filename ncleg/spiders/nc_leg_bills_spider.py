@@ -13,7 +13,7 @@ class NcLegBillsSpider(scrapy.Spider):
 
     def start_requests(self):
         # Bills are numbered predictably so increment bill number += 1
-        while self.billStart > 0:
+        while self.billStart < 3:
             yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.billStart)).replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse)
             self.billStart += 1
 
@@ -29,7 +29,7 @@ class NcLegBillsSpider(scrapy.Spider):
         item['chamber'] = response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\w+')[0]
         item['session'] = response.xpath('//div[@id = "mainBody"]/div[3]/text()').extract_first()
         item['title'] = response.xpath('//div[@id = "title"]/a/text()').extract_first()
-        item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
-        item['keywords'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').extract_first()
+        item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').extract_first()
+        item['keywords'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').re('[^,]+')
 
         yield item
