@@ -13,6 +13,14 @@ class NclegItem(scrapy.Item):
     # name = scrapy.Field()
     pass
 
+class Bill(scrapy.Item):
+    number = scrapy.Field()
+    chamber = scrapy.Field()
+    session = scrapy.Field()
+    title = scrapy.Field()
+    sponsors = scrapy.Field()
+    keywords = scrapy.Field()
+
 class Member(scrapy.Item):
     member = scrapy.Field()
     memberId = scrapy.Field()

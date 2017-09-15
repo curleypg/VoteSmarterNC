@@ -1,4 +1,5 @@
 import scrapy
+from ncleg.items import Bill
 
 class NcLegBillsSpider(scrapy.Spider):
     name = "bills"
@@ -11,20 +12,24 @@ class NcLegBillsSpider(scrapy.Spider):
         self.session = session
 
     def start_requests(self):
+        # Bills are numbered predictably so increment bill number += 1
         while self.billStart > 0:
             yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.billStart)).replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse)
             self.billStart += 1
 
     def parse(self, response):
+        # Return when we have incremented past the last known bill
         if len(response.xpath('//div[@id = "title"]/text()').re('Not Found')) > 0:
             self.billStart = -1
             return
 
-        yield {
-            'number': response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\d+')[0],
-            'chamberOrigin': response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\w+')[0],
-            'session': response.xpath('//div[@id = "mainBody"]/div[3]/text()').extract_first(),
-            'title': response.xpath('//div[@id = "title"]/a/text()').extract_first(),
-            'sponsors': response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract(),
-            'keywords': response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').extract_first(),
-        }
+        # Use Bill item to catch data
+        item = Bill()
+        item['number'] = response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\d+')[0]
+        item['chamber'] = response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\w+')[0]
+        item['session'] = response.xpath('//div[@id = "mainBody"]/div[3]/text()').extract_first()
+        item['title'] = response.xpath('//div[@id = "title"]/a/text()').extract_first()
+        item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
+        item['keywords'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').extract_first()
+
+        yield item
