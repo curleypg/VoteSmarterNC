@@ -9,7 +9,7 @@ The scrapy extracts each bill's data into an object. Use [scrapy](https://github
 1. Requires python3, scrapy, and related dependencies.
 1. Install scrapy, using pip for example: `pip install scrapy`
 1. Navigate into repo
-1. Tell scrapy to crawl "bills" via command line instruction. Pass "session" and "chamber" options. For example scrape bills Senate bills from 2017-2018 session to a json file: `scrapy crawl <spider> -a chamber=S -a session=2017 -o <filename>.json`
+1. Tell scrapy to crawl "bills" via command line instruction. Pass "session" and "chamber" options (chamber is optional, passing no param will scrape both chambers). For example scrape bills Senate bills from 2017-2018 session to a json file: `scrapy crawl <spider> -a chamber=S -a session=2017 -o <filename>.json`
 
 ## Current spiders
 
