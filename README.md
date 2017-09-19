@@ -16,8 +16,17 @@ The scrapy extracts each bill's data into an object. Use [scrapy](https://github
 So far, I've simply created a spider class for each individual page of information.
 
 * `bills` - retrieves bill info
-* `rollcall` - retrieves all rollcall votes (include bills, amendments, procedural votes...)
 * `membersvotes` - retrieves basic member information along with every member vote from the request session
+
+## AutoThrottle
+
+In order to politely preserve this public resource, please manage your autothrottle settings appropriately in `settings.py` file.
+
+## TO-DO
+
+* Support for sessions prior to `2017`. The current problem is there exist no links to member pages in sessions prior to 2017.
+* Better member scraping and find a unique numerical ID which may exist in the back-end.
+* Prepare a single-file format for a universal export of bill and/or voting data.
 
 ## More docs
 

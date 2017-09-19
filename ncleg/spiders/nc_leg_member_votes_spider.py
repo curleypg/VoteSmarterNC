@@ -15,13 +15,12 @@ class NcLegMemberVotesSpider(scrapy.Spider):
         self.chamber = chamber
 
     def start_requests(self):
-        # If a chamber is specified, scrape it. Otherwise get both!
+        # If a chamber is specified, scrape only it. Otherwise get both!
         if self.chamber in self.chambers:
+            self.chambers = [self.chamber]
+        for c in self.chambers:
+            self.chamber = c
             yield scrapy.Request(url=self.url.replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse_members)
-        else:
-            for c in self.chambers:
-                self.chamber = c
-                yield scrapy.Request(url=self.url.replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse_members)
 
     def parse_members(self, response):
         # Grab member data on their individual Roll Call votes
