@@ -6,14 +6,22 @@ class NcLegMemberVotesSpider(scrapy.Spider):
     name = "membersvotes"
     base = 'http://www.ncleg.net/'
     url = 'http://www.ncleg.net/gascripts/voteHistory/MemberVoteHistory.pl?sSession=%session%&sChamber=%chamber%'
+    # Set the available chambers (House and Senate)
+    chambers = ['H','S']
 
     def __init__(self, chamber='', session='',*args, **kwargs):
         super(NcLegMemberVotesSpider, self).__init__(*args, **kwargs)
-        self.chamber = chamber
         self.session = session
+        self.chamber = chamber
 
     def start_requests(self):
-        yield scrapy.Request(url=self.url.replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse_members)
+        # If a chamber is specified, scrape it. Otherwise get both!
+        if self.chamber in self.chambers:
+            yield scrapy.Request(url=self.url.replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse_members)
+        else:
+            for c in self.chambers:
+                self.chamber = c
+                yield scrapy.Request(url=self.url.replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse_members)
 
     def parse_members(self, response):
         # Grab member data on their individual Roll Call votes
@@ -41,7 +49,7 @@ class NcLegMemberVotesSpider(scrapy.Spider):
             else:
                 billTitle = motionData[0].strip()
                 motion = ''
-            info['chamber'] = 'House' if self.chamber == 'H' else 'Senate'
+            info['chamber'] = 'House' if self.chamber == 'S' else 'Senate'
             # Check the bill ID
             bill = vote.xpath('td[2]/a/text()').extract_first()
             if bill.isspace():

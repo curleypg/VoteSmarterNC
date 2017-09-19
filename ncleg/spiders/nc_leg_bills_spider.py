@@ -5,6 +5,8 @@ class NcLegBillsSpider(scrapy.Spider):
     name = "bills"
     houseBills = 'http://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=%chamber%%num%&Session=%session%'
     billStart = 1
+    # Set the available chambers (House and Senate)
+    chambers = ['H','S']
 
     def __init__(self, chamber='', session='',*args, **kwargs):
         super(NcLegBillsSpider, self).__init__(*args, **kwargs)
@@ -12,10 +14,14 @@ class NcLegBillsSpider(scrapy.Spider):
         self.session = session
 
     def start_requests(self):
-        # Bills are numbered predictably so increment bill number += 1
-        while self.billStart > 0:
-            yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.billStart)).replace('%chamber%',self.chamber).replace('%session%', str(self.session)), callback=self.parse)
-            self.billStart += 1
+        # Check if getting single chamber or both
+        if self.chamber in self.chambers:
+            self.chambers = [self.chamber]
+        for c in self.chambers:
+            # Bills are numbered predictably so increment bill number += 1
+            while self.billStart > 0:
+                yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.billStart)).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
+                self.billStart += 1
 
     def parse(self, response):
         # Return when we have incremented past the last known bill
