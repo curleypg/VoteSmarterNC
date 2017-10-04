@@ -24,9 +24,9 @@ In order to politely preserve this public resource, please manage your autothrot
 
 ## TO-DO
 
-* Support for sessions prior to `2017`. The current problem is there exist no links to member pages in sessions prior to 2017.
 * Better member scraping and find a unique numerical ID which may exist in the back-end.
 * Prepare a single-file format for a universal export of bill and/or voting data.
+* Get the primary sponsors from bills
 
 ## More docs
 
