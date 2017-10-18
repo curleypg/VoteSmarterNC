@@ -1,5 +1,6 @@
 import scrapy
 from ncleg.items import Bill
+import logging
 
 class NcLegBillsSpider(scrapy.Spider):
     name = "bills"
@@ -22,6 +23,7 @@ class NcLegBillsSpider(scrapy.Spider):
             while self.billStart > 0:
                 yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.billStart)).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
                 self.billStart += 1
+            self.billStart = 1
 
     def parse(self, response):
         # Return when we have incremented past the last known bill
