@@ -42,9 +42,7 @@ class NcLegBillsSpider(scrapy.Spider):
         if (self.session == '2017'):
             item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
         else:
-            item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
-
+            item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re(r'\b(?!Primary\b)\w+\.?\ ?\-?\'?\w+\b')
 
         item['keywords'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').re('[^,]+')
-
         yield item
