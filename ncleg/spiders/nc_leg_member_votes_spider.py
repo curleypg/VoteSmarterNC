@@ -35,6 +35,7 @@ class NcLegMemberVotesSpider(scrapy.Spider):
     def parse_vote(self, response):
         # Grab the item from meta
         info = response.meta['item']
+        info['session'] = response.xpath('//div[@id="mainBody"]/div[@class="titleSub"]/text()').extract_first()
         voteTable = response.xpath('//div[@id="mainBody"]/table/tr')
         # Skip the first table row of header information
         for vote in voteTable[1:]:
