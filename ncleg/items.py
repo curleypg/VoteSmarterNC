@@ -47,3 +47,4 @@ class MemberVotes(scrapy.Item):
     excvote = scrapy.Field()
     totalvote = scrapy.Field()
     result = scrapy.Field()
+    session = scrapy.Field()
