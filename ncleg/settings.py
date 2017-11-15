@@ -77,7 +77,7 @@ ROBOTSTXT_OBEY = True
 #AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
-#AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
+#AUTOTHROTTLE_TARGET_CONCURRENCY = 2.0
 # Enable showing throttling stats for every response received:
 #AUTOTHROTTLE_DEBUG = False
 
@@ -88,3 +88,8 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# Feed Export Options
+# See https://doc.scrapy.org/en/latest/topics/feed-exports.html#settings
+# Force UTF-8 for all export feeds
+FEED_EXPORT_ENCODING = 'utf-8'
