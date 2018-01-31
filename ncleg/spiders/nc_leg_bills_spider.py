@@ -42,7 +42,8 @@ class NcLegBillsSpider(scrapy.Spider):
         # In 2017 member names are embedded in links
         if (self.session == '2017'):
             item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
-            item['primary_sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a[contains(following-sibling::text(), "Primary")]/text()').extract()
+            item['primary_sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a[contains(following-sibling::text(), "Primary")]/preceding-sibling::a/text()').extract()
+            item['primary_sponsors'].extend(response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a[contains(following-sibling::text(), "Primary")]/text()').extract())
         else:
             item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
 
