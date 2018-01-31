@@ -44,6 +44,13 @@ class NcLegBillsSpider(scrapy.Spider):
             item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
             item['primary_sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a[contains(following-sibling::text(), "Primary")]/text()').extract()
         else:
-            item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
+            sponsors = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
+            primary = sponsors.index("Primary")
+            if (primary > -1):
+                item['primary_sponsors'] = sponsors[0:primary]
+                del sponsors[primary]
+            item['sponsors'] = sponsors
+
+
 
         yield item
