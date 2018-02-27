@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Scrapy settings for ncleg project
+# Scrapy settings for ncleg project.
+#
+#Copy this to settings.py file before scraping.
+#
+# Required settings are not commented but you should consider adjusting Robots,
+# AutoThrottle, Force UTF-8, and Pipelines according to your needs.
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -19,7 +24,7 @@ NEWSPIDER_MODULE = 'ncleg.spiders'
 #USER_AGENT = 'ncleg (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+# ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -92,4 +97,8 @@ ROBOTSTXT_OBEY = True
 # Feed Export Options
 # See https://doc.scrapy.org/en/latest/topics/feed-exports.html#settings
 # Force UTF-8 for all export feeds
-FEED_EXPORT_ENCODING = 'utf-8'
+# FEED_EXPORT_ENCODING = 'utf-8'
+
+# Configure MongoDB settings used by MongoPipeline
+#MONGO_URI = 'mongodb://localhost:27017'
+#MONGO_DATABASE = ''
