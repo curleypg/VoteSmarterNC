@@ -1,15 +1,17 @@
 import scrapy
 from ncleg.items import Bill
-import logging
+from urllib.parse import urlparse, parse_qs
 
 class NcLegBillsSpider(scrapy.Spider):
     name = "bills"
     houseBills = 'http://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=%chamber%%num%&Session=%session%'
     billStart = 1
+    houseBillStart = 1
+    senateBillStart = 1
     # Set the available chambers (House and Senate)
-    chambers = ['H','S']
+    chambers = ['H', 'S']
 
-    def __init__(self, chamber='', session='',*args, **kwargs):
+    def __init__(self, chamber='', session='', *args, **kwargs):
         super(NcLegBillsSpider, self).__init__(*args, **kwargs)
         self.chamber = chamber
         self.session = session
@@ -20,15 +22,24 @@ class NcLegBillsSpider(scrapy.Spider):
             self.chambers = [self.chamber]
         for c in self.chambers:
             # Bills are numbered predictably so increment bill number += 1
-            while self.billStart > 0:
-                yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.billStart)).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
-                self.billStart += 1
-            self.billStart = 1
+            if (c == 'H'):
+                while self.houseBillStart > 0:
+                    yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.houseBillStart)).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
+                    self.houseBillStart += 1
+
+            if (c == 'S'):
+                while self.senateBillStart > 0:
+                    yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.senateBillStart)).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
+                    self.senateBillStart += 1
 
     def parse(self, response):
         # Return when we have incremented past the last known bill
         if len(response.xpath('//div[@id = "title"]/text()').re('Not Found')) > 0:
-            self.billStart = -1
+            chamber = parse_qs(urlparse(response.url).query)['BillID'][0][0]
+            if (chamber == 'H'):
+                self.houseBillStart = -1
+            if (chamber == 'S'):
+                self.senateBillStart = -1
             return
 
         # Use Bill item to catch data
@@ -46,6 +57,10 @@ class NcLegBillsSpider(scrapy.Spider):
             item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
             item['primary_sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/br/preceding-sibling::a/text()').extract()
         else:
-            item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
-
+            sponsors = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
+            primary = sponsors.index("Primary")
+            if (primary > -1):
+                item['primary_sponsors'] = sponsors[0:primary]
+                del sponsors[primary]
+            item['sponsors'] = sponsors
         yield item
