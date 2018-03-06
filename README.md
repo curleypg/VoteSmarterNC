@@ -27,10 +27,6 @@ In order to politely preserve this public resource, please manage your autothrot
 
 * Better member scraping and find a unique numerical ID which may exist in the back-end.
 * Prepare a single-file format for a universal export of bill and/or voting data.
-* Get the primary sponsors from bills
-* Get Bill counties data
-* Get Bill statutes data
-
 ## More docs
 
 [More documentation on extending scrapy functionality & output formats](https://doc.scrapy.org/en/latest/topics/commands.html).
