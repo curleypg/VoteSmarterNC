@@ -51,11 +51,13 @@ class NcLegBillsSpider(scrapy.Spider):
         item['session'] = response.xpath('//div[@id = "mainBody"]/div[3]/text()').extract_first()
         item['title'] = response.xpath('//div[@id = "title"]/a/text()').extract_first()
         item['keywords'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').re('[^,]+')
+        item['counties'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[4]/td/text()').re('[^,]+')
+        item['statutes'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[5]/td/div/text()').re('[^,]+')
 
         # In 2017 member names are embedded in links
         if (self.session == '2017'):
             item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
-            item['primary_sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a[contains(following-sibling::text(), "Primary")]/text()').extract()
+            item['primary_sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/br/preceding-sibling::a/text()').extract()
         else:
             sponsors = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
             primary = sponsors.index("Primary")
