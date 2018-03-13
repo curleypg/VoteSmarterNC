@@ -3,12 +3,14 @@ from ncleg.items import Bill
 from urllib.parse import urlparse, parse_qs
 
 class NcLegBillsSpider(scrapy.Spider):
+    # Spider name
     name = "bills"
+    # Bills URL skeleton
     houseBills = 'http://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=%chamber%%num%&Session=%session%'
-    billStart = 1
+    # Track house and senate bills progression separately
     houseBillStart = 1
     senateBillStart = 1
-    # Set the available chambers (House and Senate)
+    # Set the available chambers (House and Senate) for parsing
     chambers = ['H', 'S']
 
     def __init__(self, chamber='', session='', *args, **kwargs):
@@ -17,11 +19,11 @@ class NcLegBillsSpider(scrapy.Spider):
         self.session = session
 
     def start_requests(self):
-        # Check if getting single chamber or both
+        # Check if parsing single chamber or both
         if self.chamber in self.chambers:
             self.chambers = [self.chamber]
+        # Bills are numbered predictably so increment bill number += 1
         for c in self.chambers:
-            # Bills are numbered predictably so increment bill number += 1
             if (c == 'H'):
                 while self.houseBillStart > 0:
                     yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.houseBillStart)).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
@@ -42,7 +44,7 @@ class NcLegBillsSpider(scrapy.Spider):
                 self.senateBillStart = -1
             return
 
-        # Use Bill item to catch data
+        # Use Bill Item to catch data
         item = Bill()
         item['number'] = response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\d+')[0]
         item['chamber'] = response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\w+')[0]

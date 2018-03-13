@@ -23,13 +23,13 @@ So far, I've simply created a spider class for each individual page of informati
 
 In order to politely preserve this public resource, please manage your autothrottle settings appropriately in `settings.py` file.
 
+## Exporting to MongoDB
+
+If you want to seed a database with the data parsed by these spiders we can utilize the MongoPipeline. You will want to enable the pipeline in `settings.py`. You will also want to set the MONGO_URI and MONGO_DATABASE in the settings. Collections names will be the spider name by default.
+
 ## TO-DO
 
-* Better member scraping and find a unique numerical ID which may exist in the back-end.
-* Prepare a single-file format for a universal export of bill and/or voting data.
-* Get the primary sponsors from bills
-* Get Bill counties data
-* Get Bill statutes data
+* Member scraping and better identification by unique ID rather than name (pre-2017 sessions).
 
 ## More docs
 
