@@ -32,8 +32,13 @@ If you want to seed a database with the data parsed by these spiders we can util
 
 Drop by the [Code For Charlotte Community Action Nights](https://www.meetup.com/code-for-charlotte/) held weekly. Code for Charlotte is where this project originates along with [many other wonderful civic, minded projects](http://codeforcharlotte.org/projects/).
 
+<<<<<<< HEAD
 Visit the [VoterSmarterNC JIRA Tracker](https://codeforcharlotte.atlassian.net/projects/VOTE/issues) for the list of desired features. Feel free to fork and use for your own project and needs!
 
+=======
+* Better member scraping and find a unique numerical ID which may exist in the back-end.
+* Prepare a single-file format for a universal export of bill and/or voting data.
+>>>>>>> b19603420d1f4ae14624ea99d4ce7c8b5f24abb8
 ## More docs
 
 [More documentation on extending scrapy functionality & output formats](https://doc.scrapy.org/en/latest/topics/commands.html).
