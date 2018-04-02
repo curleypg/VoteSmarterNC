@@ -23,6 +23,10 @@ class Bill(scrapy.Item):
     primary_sponsors = scrapy.Field()
     sponsors = scrapy.Field()
     keywords = scrapy.Field()
+    is_law  = scrapy.Field()
+    is_ratified = scrapy.Field()
+    is_vetoed = scrapy.Field()
+
 
 class Member(scrapy.Item):
     member = scrapy.Field()
