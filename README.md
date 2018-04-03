@@ -1,4 +1,4 @@
-# NC Legislature data Scraping
+# NC Legislature Data Scraping
 
 Use this scrapy application to obtain bill data from the [NC Legislature website](http://www.ncleg.net).
 
