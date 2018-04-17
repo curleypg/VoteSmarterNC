@@ -53,7 +53,15 @@ class NcLegBillsSpider(scrapy.Spider):
         item['keywords'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').re('[^,]+')
         item['counties'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[4]/td/text()').re('[^,]+')
         item['statutes'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[5]/td/div/text()').re('[^,]+')
-
+        
+        # Check to see if bill has been ratified 
+        # (not necessarily vetoed)
+        ratified_arr = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[1]/table//tr//td//text()').re('[^,]+')
+        if "Ratified" in ratified_arr:
+            item['is_ratified'] = True
+        else:
+            item['is_ratified'] = False
+        
         # In 2017 member names are embedded in links
         if (self.session == '2017'):
             item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
@@ -66,3 +74,4 @@ class NcLegBillsSpider(scrapy.Spider):
                 del sponsors[primary]
             item['sponsors'] = sponsors
         yield item
+
