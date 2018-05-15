@@ -6,7 +6,7 @@ class NcLegBillsSpider(scrapy.Spider):
     # Spider name
     name = "bills"
     # Bills URL skeleton
-    houseBills = 'http://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=%chamber%%num%&Session=%session%'
+    houseBills = 'https://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=%chamber%%num%&Session=%session%'
     # Track house and senate bills progression separately
     houseBillStart = 1
     senateBillStart = 1
@@ -46,23 +46,25 @@ class NcLegBillsSpider(scrapy.Spider):
 
         # Use Bill Item to catch data
         item = Bill()
-        item['number'] = response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\d+')[0]
-        item['chamber'] = response.xpath('//div[@id = "mainBody"]/table[1]/tr/td[2]/text()').re('\w+')[0]
-        item['session'] = response.xpath('//div[@id = "mainBody"]/div[3]/text()').extract_first()
+        item['number'] = response.xpath('/html/body/div/table/tr/td/table/tr/td[2]').re('\d+')[1]
+        item['chamber'] = response.xpath('/html/body/div/table/tr/td/table/tr/td[2]/text()').re('\w+')[0]
+        item['session'] = response.css('.titleSub::text').extract_first()
         item['title'] = response.xpath('//div[@id = "title"]/a/text()').extract_first()
-        item['keywords'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').re('[^,]+')
-        item['counties'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[4]/td/text()').re('[^,]+')
-        item['statutes'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[5]/td/div/text()').re('[^,]+')
-        
-        # Check to see if bill had been ratified 
-        item['is_ratified'] = self.isRatified(response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[1]/table//tr//td//text()').re('[^,]+'))
-       
-        # In 2017 member names are embedded in links
+        item['counties'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[4]/td/text()').re('[^,]+')
+        item['statutes'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[5]/td/div/text()').re('[^\n][^,]+')
+        keywords = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').extract_first().split(', ')
+        item['keywords'] = keywords
+
+        #
+        # Check to see if bill had been ratified. This info is available in bill keywords
+        item['is_ratified'] = self.isRatified(keywords)
+        #
+        # # In 2017 member names are embedded in links
         if (self.session == '2017'):
-            item['sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').extract()
-            item['primary_sponsors'] = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/br/preceding-sibling::a/text()').extract()
+            item['sponsors'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').re('[^,]+')
+            item['primary_sponsors'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/br/preceding-sibling::a/text()').extract()
         else:
-            sponsors = response.xpath('//div[@id = "mainBody"]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
+            sponsors = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
             primary = sponsors.index("Primary")
             if (primary > -1):
                 item['primary_sponsors'] = sponsors[0:primary]
@@ -71,7 +73,6 @@ class NcLegBillsSpider(scrapy.Spider):
         yield item
 
     def isRatified(self, arr):
-        if "Ratified" in arr:
+        if "RATIFIED" in arr:
             return True
         return False
-
