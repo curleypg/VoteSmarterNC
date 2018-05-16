@@ -59,7 +59,12 @@ class NcLegBillsSpider(scrapy.Spider):
         # Check to see if bill had been ratified. This info is available in bill keywords
         item['is_ratified'] = self.isRatified(keywords)
         #
-        # # In 2017 member names are embedded in links
+
+        # Check to see if bill had been ratified and/or is law
+        d_arr = response.xpath('/html/body/div/table/tr/td/table[2]/tr/td[1]/table/tr//td[1]//a/text()').extract()
+        item['is_law'] = self.isLaw(d_arr)
+
+        # In 2017 member names are embedded in links
         if (self.session == '2017'):
             item['sponsors'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').re('[^,]+')
             item['primary_sponsors'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/br/preceding-sibling::a/text()').extract()
@@ -75,4 +80,10 @@ class NcLegBillsSpider(scrapy.Spider):
     def isRatified(self, arr):
         if "RATIFIED" in arr:
             return True
+        return False
+
+    def isLaw(self, arr):
+        for i in range(len(arr)):
+            if "Law" in arr[i]:
+                return True
         return False
