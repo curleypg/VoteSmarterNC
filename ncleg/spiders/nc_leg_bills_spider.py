@@ -13,26 +13,40 @@ class NcLegBillsSpider(scrapy.Spider):
     # Set the available chambers (House and Senate) for parsing
     chambers = ['H', 'S']
 
-    def __init__(self, chamber='', session='', *args, **kwargs):
+    def __init__(self, chamber='', session='', number='', *args, **kwargs):
         super(NcLegBillsSpider, self).__init__(*args, **kwargs)
         self.chamber = chamber
         self.session = session
+        self.number = number
 
     def start_requests(self):
         # Check if parsing single chamber or both
         if self.chamber in self.chambers:
             self.chambers = [self.chamber]
+
+        # Remove all whitespace in number parameter then split commas into array
+        self.number = self.number.replace(" ", "")
+        num_arr = self.number.split(",")
+
         # Bills are numbered predictably so increment bill number += 1
         for c in self.chambers:
-            if (c == 'H'):
+            if (c == 'H' and self.number == ''):
                 while self.houseBillStart > 0:
                     yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.houseBillStart)).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
                     self.houseBillStart += 1
 
-            if (c == 'S'):
+            elif (c == 'H'):
+                for i in range(len(num_arr)):
+                    yield scrapy.Request(url=self.houseBills.replace('%num%',str(num_arr[i])).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
+
+            if (c == 'S' and self.number == ''):
                 while self.senateBillStart > 0:
                     yield scrapy.Request(url=self.houseBills.replace('%num%',str(self.senateBillStart)).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
                     self.senateBillStart += 1
+
+            elif (c == 'S'):
+                for i in range(len(num_arr)):
+                    yield scrapy.Request(url=self.houseBills.replace('%num%',str(num_arr[i])).replace('%chamber%',c).replace('%session%', str(self.session)), callback=self.parse)
 
     def parse(self, response):
         # Return when we have incremented past the last known bill
