@@ -4,8 +4,8 @@ from ncleg.items import Member, MemberVotes
 
 class NcLegMemberVotesSpider(scrapy.Spider):
     name = "membersvotes"
-    base = 'http://www.ncleg.net/'
-    url = 'http://www.ncleg.net/gascripts/voteHistory/MemberVoteHistory.pl?sSession=%session%&sChamber=%chamber%'
+    base = 'https://www.ncleg.net/'
+    url = 'https://www.ncleg.net/gascripts/voteHistory/MemberVoteHistory.pl?sSession=%session%&sChamber=%chamber%'
     # Set the available chambers (House and Senate)
     chambers = ['H','S']
 
@@ -24,7 +24,7 @@ class NcLegMemberVotesSpider(scrapy.Spider):
 
     def parse_members(self, response):
         # Grab member data on their individual Roll Call votes
-        for member in response.xpath('//div[@id="mainBody"]/ul/li'):
+        for member in response.xpath('/html/body/div/table/tr/td/ul/li'):
             info = MemberVotes()
             info['member'] = member.xpath('.//a/text()').extract_first().replace('\u00a0', ' ')
             href = member.xpath('.//a/@href').extract_first()
@@ -35,8 +35,8 @@ class NcLegMemberVotesSpider(scrapy.Spider):
     def parse_vote(self, response):
         # Grab the item from meta
         info = response.meta['item']
-        info['session'] = response.xpath('//div[@id="mainBody"]/div[@class="titleSub"]/text()').extract_first()
-        voteTable = response.xpath('//div[@id="mainBody"]/table/tr')
+        info['session'] = response.css('.titleSub::text').extract_first()
+        voteTable = response.xpath('/html/body/div/table/tr/td[1]/table/tr')
         # Skip the first table row of header information
         for vote in voteTable[1:]:
             info['rcs'] = vote.xpath('td[1]/text()').extract_first()
