@@ -69,10 +69,21 @@ class NcLegBillsSpider(scrapy.Spider):
         keywords = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').extract_first().split(', ')
         item['keywords'] = keywords
 
-        #
+        # This will loop through all possible xpaths in the detailed table, and will stop
+        # if empty list is returned
+        i = 3
+        while (response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[3]/text()').extract()):
+            v = response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[3]/text()').extract()
+            if ('Passed 3rd Reading' in v[0]):
+                item['passed_3rd_reading'] = True
+
+            if ('Passed 2nd Reading' in v[0]):
+                item['passed_2nd_reading'] = True
+            i = i + 1
+
+
         # Check to see if bill had been ratified. This info is available in bill keywords
         item['is_ratified'] = self.isRatified(keywords)
-        #
 
         # Check to see if bill had been ratified and/or is law
         d_arr = response.xpath('/html/body/div/table/tr/td/table[2]/tr/td[1]/table/tr//td[1]//a/text()').extract()
