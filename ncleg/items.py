@@ -28,6 +28,8 @@ class Bill(scrapy.Item):
     is_law  = scrapy.Field()
     is_ratified = scrapy.Field()
     is_vetoed = scrapy.Field()
+    passed_House = scrapy.Field()
+    passed_Senate = scrapy.Field()
 
 class Member(scrapy.Item):
     member = scrapy.Field()
