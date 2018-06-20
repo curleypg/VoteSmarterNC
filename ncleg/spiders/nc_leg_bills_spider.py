@@ -68,17 +68,18 @@ class NcLegBillsSpider(scrapy.Spider):
         item['statutes'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[5]/td/div/text()').re('[^\n][^,]+')
         keywords = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').extract_first().split(', ')
         item['keywords'] = keywords
+        item['passed_House'] = False
+        item['passed_Senate'] = False
 
         # This will loop through all possible xpaths in the detailed table, and will stop
         # if empty list is returned
         i = 3
         while (response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[3]/text()').extract()):
             v = response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[3]/text()').extract()
-            if ('Passed 3rd Reading' in v[0]):
-                item['passed_3rd_reading'] = True
-
-            if ('Passed 2nd Reading' in v[0]):
-                item['passed_2nd_reading'] = True
+            if ('Passed 3rd Reading' in v[0] and 'House' in response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[2]/text()').extract()[0]):
+                item['passed_House'] = True
+            if ('Passed 3rd Reading' in v[0] and 'Senate' in response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[2]/text()').extract()[0]):
+                item['passed_Senate'] = True
             i = i + 1
 
 
