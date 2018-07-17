@@ -18,6 +18,7 @@ Requires python3 and scrapy.
 
 ## Current spiders
 * `bills` - retrieves individual bill information
+* `members` - retrieves NCGA representative data
 * `membersvotes` - retrieves each member vote from the entire session specified along with some basic member info
 
 ## AutoThrottle
