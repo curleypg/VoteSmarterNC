@@ -32,11 +32,12 @@ class Bill(scrapy.Item):
     passed_Senate = scrapy.Field()
 
 class Member(scrapy.Item):
-    member = scrapy.Field()
-    memberId = scrapy.Field()
+    chamber = scrapy.Field()
     district = scrapy.Field()
     href = scrapy.Field()
-    vote = scrapy.Field()
+    member = scrapy.Field()
+    memberId = scrapy.Field()
+    party = scrapy.Field()
 
 class MemberVotes(scrapy.Item):
     member = scrapy.Field()
