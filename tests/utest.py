@@ -31,8 +31,8 @@ class TestBills(unittest.TestCase):
     def testSenateSession(self):
         with open ('test.json') as f:
             records = json.load(f)
-        self.assertEqual(records[0]['session'], '2017-2018 Session')
-        self.assertEqual(records[1]['session'], '2017-2018 Session')
+        self.assertEqual(records[0]['session'], '2017')
+        self.assertEqual(records[1]['session'], '2017')
 
     def testSenateTitle(self):
         with open ('test.json') as f:
@@ -49,14 +49,14 @@ class TestBills(unittest.TestCase):
     def testSenateStatutes(self):
         with open ('test.json') as f:
             records = json.load(f)
-        self.assertEqual(records[0]['statutes'], ['115C-84.2 (Section)'])
-        self.assertEqual(records[1]['statutes'], ['66 (Chapter); 66-450', ', 66-451', ', 66-452', ', 66-453 (Sections)'])
+        self.assertEqual(records[0]['statutes'], '115C-84.2 (Sections)')
+        self.assertEqual(records[1]['statutes'], '66 (Chapters); 66-450, 66-451, 66-452, 66-453 (Sections)')
 
     def testSenateKeywords(self):
         with open ('test.json') as f:
             records = json.load(f)
-        self.assertEqual(records[0]['keywords'], ['BOARDS', 'CALENDAR', 'COUNTIES', 'EDUCATION', 'EDUCATION BOARDS', 'ELEMENTARY EDUCATION', 'KINDERGARTEN', 'LOCAL', 'LOCAL GOVERNMENT', 'PERSON COUNTY', 'SECONDARY EDUCATION'])
-        self.assertEqual(records[1]['keywords'], ['CHAPTERED', 'COMMERCE', 'INSURANCE', 'INSURANCE', 'LIABILITY', 'LIABILITY', 'PRESENTED', 'PUBLIC', 'RATIFIED', 'RECREATION & LEISURE'])
+        self.assertEqual(records[0]['keywords'], ['BOARDS', 'CALENDAR', 'COUNTIES', 'EDUCATION', 'EDUCATION BOARDS', 'ELEMENTARY EDUCATION', 'KINDERGARTEN', 'LOCAL', 'LOCAL GOVERNMENT', 'SECONDARY EDUCATION', 'PERSON COUNTY'])
+        self.assertEqual(records[1]['keywords'], ['COMMERCE', 'INSURANCE', 'INSURANCE', 'LIABILITY', 'PRESENTED', 'PUBLIC', 'RATIFIED', 'RECREATION & LEISURE', 'LIABILITY', 'CHAPTERED'])
 
     def testSenatePassedHouse(self):
         with open ('test.json') as f:

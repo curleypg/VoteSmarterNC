@@ -1,12 +1,13 @@
 import scrapy
 from ncleg.items import Bill
 from urllib.parse import urlparse, parse_qs
+import logging
 
 class NcLegBillsSpider(scrapy.Spider):
     # Spider name
     name = "bills"
     # Bills URL skeleton
-    houseBills = 'https://www.ncleg.net/gascripts/BillLookUp/BillLookUp.pl?BillID=%chamber%%num%&Session=%session%'
+    houseBills = 'https://www2.ncleg.net/BillLookup/%session%/%chamber%%num%'
     # Track house and senate bills progression separately
     houseBillStart = 1
     senateBillStart = 1
@@ -60,13 +61,17 @@ class NcLegBillsSpider(scrapy.Spider):
 
         # Use Bill Item to catch data
         item = Bill()
-        item['number'] = response.xpath('/html/body/div/table/tr/td/table/tr/td[2]').re('\d+')[1]
-        item['chamber'] = response.xpath('/html/body/div/table/tr/td/table/tr/td[2]/text()').re('\w+')[0]
-        item['session'] = response.css('.titleSub::text').extract_first()
-        item['title'] = response.xpath('//div[@id = "title"]/a/text()').extract_first()
-        item['counties'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[4]/td/text()').re('[^,]+')
-        item['statutes'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[5]/td/div/text()').re('[^\n][^,]+')
-        keywords = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[6]/td/div/text()').extract_first().split(', ')
+        item['number'] = response.xpath('/html/body/div/div[1]/div[3]/text()').re('\d+')[0]
+        item['chamber'] = response.xpath('/html/body/div/div[1]/div[3]/text()').re('\w+')[0]
+        item['session'] = self.session
+        item['title'] = response.xpath('/html/body/div/div[2]/div[1]/a/text()').extract_first()
+        counties = response.xpath('/html/body/div/div[3]/div[2]/div/div[8]/text()').re('[^,]+')
+        if (counties[0] == 'No counties specifically cited'):
+            item['counties'] = []
+        else:
+            item['counties'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[8]/text()').re('[^,]+')
+        item['statutes'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[10]/text()').extract_first()
+        keywords = response.xpath('/html/body/div/div[3]/div[2]/div/div[12]/text()').extract_first().split(', ')
         item['keywords'] = keywords
         item['passed_House'] = False
         item['passed_Senate'] = False
@@ -82,7 +87,6 @@ class NcLegBillsSpider(scrapy.Spider):
                 item['passed_Senate'] = True
             i = i + 1
 
-
         # Check to see if bill had been ratified. This info is available in bill keywords
         item['is_ratified'] = self.isRatified(keywords)
 
@@ -92,10 +96,11 @@ class NcLegBillsSpider(scrapy.Spider):
 
         # In 2017 member names are embedded in links
         if (self.session == '2017'):
-            item['sponsors'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/a/text()').re('[^,]+')
-            item['sponsors_ids'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/a/@href').re('\d+')
-            item['primary_sponsors'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/br/preceding-sibling::a/text()').extract()
-            item['primary_sponsors_ids'] = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/br/preceding-sibling::a/@href').re('\d+')
+            logging.debug(response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div[1]'))
+            item['sponsors'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div/a/text()').extract()
+            item['sponsors_ids'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div/a/@href').re('\d+')
+            item['primary_sponsors'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div[1]/a/text()').extract()
+            item['primary_sponsors_ids'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div[1]/a/@href').re('\d+')
         else:
             sponsors = response.xpath('/html/body/div/table/tr/td[1]/table[2]/tr/td[3]/table/tr[2]/td/text()').re('(?!Primary$)\w+\.?\ ?\-?\'?\w+')
             primary = sponsors.index("Primary")
