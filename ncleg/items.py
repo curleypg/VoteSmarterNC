@@ -17,6 +17,7 @@ class Bill(scrapy.Item):
     number = scrapy.Field()
     chamber = scrapy.Field()
     session = scrapy.Field()
+    session_id = scrapy.Field()
     title = scrapy.Field()
     counties = scrapy.Field()
     statutes = scrapy.Field()
