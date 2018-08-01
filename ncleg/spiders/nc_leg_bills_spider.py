@@ -63,7 +63,8 @@ class NcLegBillsSpider(scrapy.Spider):
         item = Bill()
         item['number'] = response.xpath('/html/body/div/div[1]/div[3]/text()').re('\d+')[0]
         item['chamber'] = response.xpath('/html/body/div/div[1]/div[3]/text()').re('\w+')[0]
-        item['session'] = self.session
+        item['session'] = response.xpath('/html/body/div/div[2]/div[2]/text()').extract_first().strip()
+        item['session_id'] = self.session
         item['title'] = response.xpath('/html/body/div/div[2]/div[1]/a/text()').extract_first()
         counties = response.xpath('/html/body/div/div[3]/div[2]/div/div[8]/text()').re('[^,]+')
         if (counties[0] == 'No counties specifically cited'):
@@ -78,12 +79,13 @@ class NcLegBillsSpider(scrapy.Spider):
 
         # This will loop through all possible xpaths in the detailed table, and will stop
         # if empty list is returned
-        i = 3
-        while (response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[3]/text()').extract()):
-            v = response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[3]/text()').extract()
-            if ('Passed 3rd Reading' in v[0] and 'House' in response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[2]/text()').extract()[0]):
+        i = 1
+        while (response.xpath('/html/body/div/div[3]/div[4]/div/div[2]/div[' + str(i) + ']/div[6]/text()').extract()):
+            msg = response.xpath('/html/body/div/div[3]/div[4]/div/div[2]/div[' + str(i) + ']/div[6]/text()').extract_first()
+            chamber = response.xpath('/html/body/div/div[3]/div[4]/div/div[2]/div[' + str(i) + ']/div[4]/text()').extract_first()
+            if ('Passed 3rd Reading' == msg and 'House' == chamber):
                 item['passed_House'] = True
-            if ('Passed 3rd Reading' in v[0] and 'Senate' in response.xpath('/html/body/div/table/tr/td[1]/center/table/tr[' + str(i) + ']/td[2]/text()').extract()[0]):
+            if ('Passed 3rd Reading' == msg and 'Senate' == chamber):
                 item['passed_Senate'] = True
             i = i + 1
 
@@ -91,7 +93,7 @@ class NcLegBillsSpider(scrapy.Spider):
         item['is_ratified'] = self.isRatified(keywords)
 
         # Check to see if bill had been ratified and/or is law
-        d_arr = response.xpath('/html/body/div/table/tr/td/table[2]/tr/td[1]/table/tr//td[1]//a/text()').extract()
+        d_arr = response.xpath('/html/body/div/div[1]/div[3]/text()').re('[A-Za-z]+')
         item['is_law'] = self.isLaw(d_arr)
 
         # In 2017 member names are embedded in links
@@ -117,6 +119,6 @@ class NcLegBillsSpider(scrapy.Spider):
 
     def isLaw(self, arr):
         for i in range(len(arr)):
-            if "Law" in arr[i]:
+            if "SL" in arr[i]:
                 return True
         return False
