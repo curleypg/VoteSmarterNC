@@ -1,7 +1,6 @@
 import scrapy
 from ncleg.items import Bill
 from urllib.parse import urlparse, parse_qs
-import logging
 
 class NcLegBillsSpider(scrapy.Spider):
     # Spider name
@@ -51,11 +50,11 @@ class NcLegBillsSpider(scrapy.Spider):
 
     def parse(self, response):
         # Return when we have incremented past the last known bill
-        if len(response.xpath('//div[@id = "title"]/text()').re('Not Found')) > 0:
-            chamber = parse_qs(urlparse(response.url).query)['BillID'][0][0]
-            if (chamber == 'H'):
+        if len(response.xpath('/html/body/div/div/div/text()').re('This bill does not exist.')) > 0:
+            chamber = urlparse(response.url).path.split('/')[3]
+            if 'H' in chamber:
                 self.houseBillStart = -1
-            if (chamber == 'S'):
+            if 'S' in chamber:
                 self.senateBillStart = -1
             return
 
@@ -97,8 +96,7 @@ class NcLegBillsSpider(scrapy.Spider):
         item['is_law'] = self.isLaw(d_arr)
 
         # In 2017 member names are embedded in links
-        if (self.session == '2017'):
-            logging.debug(response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div[1]'))
+        if '2017' in self.session:
             item['sponsors'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div/a/text()').extract()
             item['sponsors_ids'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div/a/@href').re('\d+')
             item['primary_sponsors'] = response.xpath('/html/body/div/div[3]/div[2]/div/div[4]/div[1]/a/text()').extract()
