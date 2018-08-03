@@ -1,5 +1,4 @@
 import scrapy
-import logging
 from urllib.parse import urlparse, parse_qs
 from ncleg.items import Member
 
@@ -9,9 +8,10 @@ class NcLegMembersSpider(scrapy.Spider):
     # Set the available chambers (House and Senate)
     chambers = ['house', 'senate']
 
-    def __init__(self, chamber='', *args, **kwargs):
+    def __init__(self, chamber='', member='', *args, **kwargs):
         super(NcLegMembersSpider, self).__init__(*args, **kwargs)
         self.chamber = chamber
+        self.member = member
 
     def start_requests(self):
         # If a chamber is specified, scrape only it. Otherwise get both!
@@ -27,6 +27,9 @@ class NcLegMembersSpider(scrapy.Spider):
             columns = row.xpath('td')
             for column in columns[1::2]:
                 item = Member()
+                item['memberId'] = int(column.xpath('a[1]/@href').re('\d+')[0])
+                if len(self.member) > 0 and item['memberId'] != int(self.member):
+                    continue
                 item['chamber'] = response.meta['chamber']
                 item['district'] = int(column.xpath('a[2]/text()').re('\d+')[0])
                 item['href'] = column.xpath('a[1]/@href').extract_first()
