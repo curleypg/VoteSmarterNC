@@ -39,6 +39,7 @@ class Member(scrapy.Item):
     member = scrapy.Field()
     memberId = scrapy.Field()
     party = scrapy.Field()
+    email = scrapy.Field()
 
 class MemberVotes(scrapy.Item):
     member = scrapy.Field()

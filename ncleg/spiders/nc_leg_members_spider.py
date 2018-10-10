@@ -4,6 +4,7 @@ from ncleg.items import Member
 
 class NcLegMembersSpider(scrapy.Spider):
     name = "members"
+    base = 'https://www.ncleg.net/'
     url = 'https://www.ncleg.net/gascripts/members/memberList.pl?sChamber=%chamber%'
     # Set the available chambers (House and Senate)
     chambers = ['house', 'senate']
@@ -36,4 +37,9 @@ class NcLegMembersSpider(scrapy.Spider):
                 item['member'] = column.xpath('a[1]/text()').extract_first()
                 item['memberId'] = int(column.xpath('a[1]/@href').re('\d+')[0])
                 item['party'] = column.xpath('text()').re('\((.*?)\)')[0]
-                yield item
+                yield scrapy.Request(url=self.base+item['href'], callback=self.parse_member, meta={'item':item})
+
+    def parse_member(self, response):
+        item = response.meta['item']
+        item['email'] = response.xpath('/html/body/div/table/tr/td[1]/table/tr[2]/td/div/table/tr[1]/td/table/tr[1]/td[2]/table/tr[4]/td/span/a/text()').extract_first()
+        yield item
